@@ -37,3 +37,7 @@ coverage/
 
 # Windows Zone.Identifier files
 *.Zone.Identifier
+# Project-specific files
+Pocket Consultant - Ads stat/
+Данные по РК Твой телеграм.md
+.claude/
