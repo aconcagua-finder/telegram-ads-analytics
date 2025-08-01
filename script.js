@@ -399,7 +399,7 @@ document.querySelectorAll('.nav a').forEach(anchor => {
 });
 
 // Enhanced hover effects for cards
-document.querySelectorAll('.campaign-card, .chart-container, .insight-card, .demo-card').forEach(card => {
+document.querySelectorAll('.campaign-card, .chart-container, .insight-card, .demo-card, .monetization-card, .timeline-item, .step-card').forEach(card => {
     card.addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-10px)';
         this.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -494,7 +494,7 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 // Observe all animatable elements
-document.querySelectorAll('.stat-card, .campaign-card, .chart-container, .insight-card, .demo-card').forEach(el => {
+document.querySelectorAll('.stat-card, .campaign-card, .chart-container, .insight-card, .demo-card, .monetization-card, .timeline-item, .step-card').forEach(el => {
     observer.observe(el);
 });
 
@@ -575,6 +575,64 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// Monetization section animations
+function animateMonetizationValues() {
+    const monetizationValues = document.querySelectorAll('.monetization-card .value');
+    monetizationValues.forEach(value => {
+        if (value.textContent.includes('₽')) {
+            const originalText = value.textContent;
+            const numericValue = parseFloat(originalText.replace(/[^\d]/g, ''));
+            if (!isNaN(numericValue)) {
+                value.setAttribute('data-original', originalText);
+                let current = 0;
+                const increment = numericValue / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= numericValue) {
+                        current = numericValue;
+                        clearInterval(timer);
+                        value.textContent = originalText;
+                    } else {
+                        value.textContent = Math.round(current).toLocaleString('ru-RU') + '₽';
+                    }
+                }, 30);
+            }
+        }
+    });
+}
+
+// Revenue projection animation
+function animateRevenueProjection() {
+    const revenueItems = document.querySelectorAll('.timeline-revenue');
+    revenueItems.forEach((item, index) => {
+        setTimeout(() => {
+            item.style.opacity = '0';
+            item.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.6s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'scale(1)';
+            }, 100);
+        }, index * 200);
+    });
+}
+
+// Initialize monetization animations
+const monetizationObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && entry.target.classList.contains('monetization-section')) {
+            animateMonetizationValues();
+            animateRevenueProjection();
+            monetizationObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.3 });
+
+const monetizationSection = document.querySelector('.monetization-section');
+if (monetizationSection) {
+    monetizationObserver.observe(monetizationSection);
+}
+
 // Performance metrics display
 function displayPerformanceMetrics() {
     const performanceData = {
@@ -590,3 +648,4 @@ function displayPerformanceMetrics() {
 
 // Initialize performance tracking
 window.addEventListener('load', displayPerformanceMetrics);
+
